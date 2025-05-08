@@ -1,156 +1,68 @@
-# pythonForMistral-7B-Instruct-v0.3
-HTML BLOCK
+pythonForMistral-7B-Instruct-v0.3
+A Python-based interface for interacting with the Mistral-7B-Instruct-v0.3 language model.
 
-<style>
-  .flask-widget {
-    background-color: #2c3e50;
-    padding: 2rem;
-    border-radius: 12px;
-    max-width: 500px;
-    margin: auto;
-    color: white;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+Overview
+This project provides a simple Python script to interact with the Mistral-7B-Instruct-v0.3 model. It allows users to input prompts and receive generated responses, which are then logged for future reference or fine-tuning purposes.
 
-  .flask-widget input[type="text"] {
-    width: 100%;
-    padding: 0.75rem;
-    margin-bottom: 1rem;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-  }
+Features
+Interactive Prompting: Input prompts directly via the command line.
 
-  .flask-widget button {
-    padding: 0.75rem 1.5rem;
-    background-color: #3498db;
-    border: none;
-    border-radius: 8px;
-    color: white;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s;
-  }
+Response Generation: Utilize the Mistral-7B-Instruct-v0.3 model to generate responses.
 
-  .flask-widget button:hover {
-    background-color: #2980b9;
-  }
+Logging: Automatically logs each prompt and its corresponding response with a timestamp to a CSV file.
 
-  #flask-response {
-    margin-top: 1rem;
-    font-style: italic;
-    color: #ecf0f1;
-  }
-</style>
+Requirements
+Python 3.6 or higher
 
-<div class="flask-widget">
-  <form id="flask-form">
-    <input type="text" id="user-prompt" placeholder="Enter your prompt" required />
-    <button type="submit">Send</button>
-  </form>
+Required Python packages:
 
-  <div id="flask-response">Awaiting response...</div>
+mistral_inference
 
-  <script>
-    document.getElementById("flask-form").addEventListener("submit", function (e) {
-      e.preventDefault();
+mistral_common
 
-      const prompt = document.getElementById("user-prompt").value;
-      const responseDiv = document.getElementById("flask-response");
-      responseDiv.innerText = "Loading...";
+Ensure that the Mistral model and tokenizer files are available locally.
 
-      fetch("https://ajsbsd.net/flask/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ prompt: prompt })
-      })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error("HTTP error " + response.status);
-        }
-        return response.text();
-      })
-      .then(data => {
-        responseDiv.innerText = data;
-      })
-      .catch(error => {
-        responseDiv.innerText = "API error: " + error;
-        console.error("Fetch error:", error);
-      });
-    });
-  </script>
-</div>
+Installation
+Clone the Repository:
 
-APACHE PROXY
+bash
+Copy
+Edit
+git clone https://github.com/ajsbsd/pythonForMistral-7B-Instruct-v0.3.git
+cd pythonForMistral-7B-Instruct-v0.3
+Install Dependencies:
 
-    ProxyPreserveHost On
-    ProxyPass /flask/ http://127.0.0.1:5000/
-    ProxyPassReverse /flask/ http://127.0.0.1:5000/
+bash
+Copy
+Edit
+pip install -r requirements.txt
+Set Up Mistral Model:
 
+Ensure the Mistral model files are located at /root/mistral_models/7B-Instruct-v0.3 or update the path in the script accordingly.
 
-</VirtualHost>
-               
-source bin/activate
-pip install --upgrade transformers
-pip install --upgrade pip
-pip install --upgrade sentencepiece
-pip install --upgrade torch
-pip install --upgrade accelerate
-cp dot.bashrc ~/.bashrc
-pip install --upgrade flask
-ssh-keygen -t ed25519
-root@n0omw58uom:/home/ai#
+Usage
+Run the main script:
 
-poc.py
-rom transformers import T5Tokenizer, T5ForConditionalGeneration
-tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-xl")
-model = T5ForConditionalGeneration.from_pretrained("google/flan-t5-xl", device_map="auto")
-input_text = "translate English to German: How old are you?"
-input_ids = tokenizer(input_text, return_tensors="pt").input_ids.to("cuda")
-outputs = model.generate(input_ids)
-print(tokenizer.decode(outputs[0]))
+bash
+Copy
+Edit
+python main.py
+Follow the on-screen prompt to input your queries. The script will display the model's response and log the interaction.
 
-app.py
+Logging
+All interactions are logged in conversation_log.csv with the following columns:
 
-rom flask import Flask, request, jsonify
-from transformers import T5ForConditionalGeneration, T5Tokenizer
+Timestamp
 
-# Load your fine-tuned FLAN model (adjust the model path if it's locally stored or on a model hub)
-model_name = "google/flan-t5-xl" # Replace this with your FLAN model path or name
-model = T5ForConditionalGeneration.from_pretrained(model_name)
-tokenizer = T5Tokenizer.from_pretrained(model_name)
+Prompt
 
-# Initialize Flask app
-app = Flask(__name__)
+Response
 
-@app.route('/')
-def home():
-    return "Welcome to the FLAN model-based Flask API!"
+This log can be used for analysis or further fine-tuning of the model.
 
-@app.route('/', methods=['POST'])
-def generate():
-    # Get the input text from the request
-    data = request.json
-    prompt = data.get("prompt", "")
-   
-    if not prompt:
-        return jsonify({"error": "No prompt provided"}), 400
+License
+This project includes components under the 4-clause BSD license:
 
-    # Tokenize input prompt
-    input_ids = tokenizer.encode(prompt, return_tensors="pt")
-   
-    # Generate response from the model
-    outputs = model.generate(input_ids, max_length=150, num_beams=5, early_stopping=True)
-   
-    # Decode the generated text
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+This product includes software developed by the University of California, Berkeley and its contributors.
 
-    return jsonify({"generated_text": generated_text})
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
+See the COPYRIGHT file for full license details.
