@@ -28,21 +28,12 @@ from datasets import load_dataset
 #dataset = load_dataset('ajsbsd/live_speech')
 from datasets import load_dataset
 
-# Login using e.g. `huggingface-cli login` to access this dataset
-datas = load_dataset("ajsbsd/live_speech")
-
-model_name = 'ajsbsd/live_speech'  # Replace with the actual model name
-
-
-# Login using e.g. `huggingface-cli login` to access this dataset
-ds = load_dataset("ajsbsd/live_speech")
-
+model_name = 'mistralai/Mistral-7B-Instruct-v0.3'  # Replace with the actual model name if different
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-#model_name = 'mistral'  # Replace with the actual model name if different
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
